@@ -1,0 +1,30 @@
+name: Deploy Spring code to GitHub Packages
+
+on:
+  push:
+    paths:
+      - ".github/workflows/spring.yml"
+      - "spec/openapi.yaml"
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PASSWORD: ${{ secrets.PASSWORD }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: codegen
+        uses: addnab/docker-run-action@v3
+        with:
+          image: openapitools/openapi-generator-cli
+          options: -v ${{ github.workspace }}:/local
+          run: docker-entrypoint.sh generate -i /local/spec/openapi.yaml -g spring -o /local/out/spring --artifact-id openapi-spring --group-id net.devfit.petclinic
+      - name: deploy package
+        uses: addnab/docker-run-action@v3
+        with:
+          image: maven
+          options: -v ${{ github.workspace }}/out/spring:/local -v ${{ github.workspace }}/config/settings.xml:/root/.m2/settings.xml -w /local -e PASSWORD
+          run: mvn deploy -DaltDeploymentRepository="github::default::https://maven.pkg.github.com/t-kiyono/petclinic-openapi"
