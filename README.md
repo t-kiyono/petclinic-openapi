@@ -10,19 +10,6 @@ Petclinic アプリケーションの OpenAPI 定義ファイルおよび、そ�
 
 pom.xml
 
-```xml
-<repositories>
-  <repository>
-    <id>central</id>
-    <url>https://repo1.maven.org/maven2</url>
-  </repository>
-  <repository>
-    <id>github</id>
-    <url>https://maven.pkg.github.com/t-kiyono/petclinic-openapi</url>
-  </repository>
-</repositories>
-```
-
 ~/.m2/settings.xml
 
 ```xml
@@ -38,15 +25,58 @@ pom.xml
 </settings>
 ```
 
+```xml
+<repositories>
+  <repository>
+    <id>central</id>
+    <url>https://repo1.maven.org/maven2</url>
+  </repository>
+  <repository>
+    <id>github</id>
+    <url>https://maven.pkg.github.com/t-kiyono/petclinic-openapi</url>
+  </repository>
+</repositories>
+
+<dependencies>
+  <dependency>
+    <groupId>net.devfit.petclinic</groupId>
+    <artifactId>openapi-spring</artifactId>
+    <version>0.1.0</version>
+  </dependency>
+</dependencies>
+```
+
 ### Gradle
 
-TBD
+build.gradle
+
+```groovy
+repositories {
+  maven {
+    url = uri("https://maven.pkg.github.com/t-kiyono/petclinic-openapi")
+    credentials {
+      username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+      password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+    }
+  }
+}
+dependencies {
+  implementation 'net.devfit.petclinic:openapi-spring:0.1.0'
+}
+```
 
 ### NPM
 
+GitHub Packages への認証
+
 ```bash
-$ npm login --scope=@t-kiyono --registry=https://npm.pkg.github.com
+$ npm login --scope=@t-kiyono --auth-type=legacy --registry=https://npm.pkg.github.com
 > Username: USERNAME
 > Password: TOKEN
-> Email: PUBLIC-EMAIL-ADDRESS
+```
+
+依存関係の追加
+
+```bash
+$ npm install @t-kiyono/petclinic-client-ts-fetch
 ```
