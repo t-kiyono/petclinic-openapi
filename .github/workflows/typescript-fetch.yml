@@ -1,0 +1,33 @@
+name: Deploy Typescript-fetch code to GitHub Packages
+
+on:
+  push:
+    paths:
+      - ".github/workflows/typescript-fetch.yml"
+      - "spec/openapi.yaml"
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: codegen
+        uses: addnab/docker-run-action@v3
+        with:
+          image: openapitools/openapi-generator-cli
+          options: -v ${{ github.workspace }}:/local
+          run: docker-entrypoint.sh generate -i /local/spec/openapi.yaml -g typescript-fetch -o /local/out/typescript-fetch -p npmName=@t-kiyono/petclinic-client-ts-fetch,npmRepository=https://npm.pkg.github.com
+      - name: deploy package
+        uses: addnab/docker-run-action@v3
+        with:
+          image: node
+          options: -v ${{ github.workspace }}/out/typescript-fetch:/local -w /local -e TOKEN=${{ secrets.GITHUB_TOKEN }}
+          run: |
+            echo "//npm.pkg.github.com/:_authToken=${TOKEN}" >> ~/.npmrc
+            npm install
+            npm publish
