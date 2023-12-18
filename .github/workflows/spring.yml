@@ -21,7 +21,7 @@ jobs:
         with:
           image: openapitools/openapi-generator-cli
           options: -v ${{ github.workspace }}:/local
-          run: docker-entrypoint.sh generate -i /local/spec/openapi.yaml -g spring -o /local/out/spring --artifact-id openapi-spring --group-id net.devfit.petclinic -p apiPackage=net.devfit.petclinic.openapi.api,modelPackage=net.devfit.petclinic.openapi.model,useTags=true
+          run: docker-entrypoint.sh generate -i /local/spec/openapi.yaml -g spring -o /local/out/spring --artifact-id openapi-spring --group-id net.devfit.petclinic -p apiPackage=net.devfit.petclinic.openapi.api,modelPackage=net.devfit.petclinic.openapi.model,useTags=true,requestMappingMode=api_interface
       - name: list of gen files
         run: ls -R ${{ github.workspace }}/out/spring
       - name: deploy package
